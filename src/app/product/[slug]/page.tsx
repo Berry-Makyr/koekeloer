@@ -1,19 +1,24 @@
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import { products } from "@/lib/data";
+import { prisma } from "@/lib/prisma";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ShoppingCart, Truck, ShieldCheck, ArrowLeft } from "lucide-react";
 import Link from "next/link";
-import { AddToCartButton } from "@/components/add-to-cart-button"; // Extracting client logic
+import { AddToCartButton } from "@/components/add-to-cart-button";
 
-// This is a server component
-export default function ProductPage({ params }: { params: { slug: string } }) {
-    const product = products.find((p) => p.slug === params.slug);
+// This is a server component that fetches from database
+export default async function ProductPage({ params }: { params: { slug: string } }) {
+    const product = await prisma.product.findUnique({
+        where: { slug: params.slug }
+    });
 
     if (!product) {
         notFound();
     }
+
+    // Parse images from JSON string
+    const images = JSON.parse(product.images);
 
     return (
         <div className="container py-8 md:py-12">
@@ -29,7 +34,7 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
                 {/* Product Image Gallery */}
                 <div className="relative aspect-square overflow-hidden rounded-xl border bg-secondary/20">
                     <Image
-                        src={product.images[0]}
+                        src={images[0]}
                         alt={product.name}
                         fill
                         className="object-cover"
@@ -83,7 +88,18 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
 
                         <div className="h-px bg-border my-2" />
 
-                        <AddToCartButton product={product} />
+                        <AddToCartButton product={{
+                            id: product.id,
+                            name: product.name,
+                            slug: product.slug,
+                            description: product.description,
+                            price: product.price,
+                            salePrice: product.salePrice || undefined,
+                            images: images,
+                            categoryId: product.categoryId,
+                            stock: product.stock,
+                            featured: product.featured
+                        }} />
                     </div>
                 </div>
             </div>

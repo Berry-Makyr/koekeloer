@@ -1,20 +1,24 @@
-import { products } from "@/lib/data";
 import { ProductCard } from "@/components/product-card";
+import { prisma } from "@/lib/prisma";
 
-export default function ShopPage() {
+export default async function ShopPage() {
+    // Fetch products from database
+    const products = await prisma.product.findMany({
+        orderBy: { createdAt: "desc" }
+    });
+
+    // Parse images for each product
+    const productsWithParsedImages = products.map(product => ({
+        ...product,
+        images: JSON.parse(product.images),
+        salePrice: product.salePrice || undefined
+    }));
+
     return (
         <div className="container py-8 md:py-12">
-            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-8">
-                <div>
-                    <h1 className="text-3xl font-bold tracking-tight">Shop All</h1>
-                    <p className="text-muted-foreground mt-2">
-                        Explore our curated collection of premium goods.
-                    </p>
-                </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                {products.map((product) => (
+            <h1 className="text-4xl font-bold tracking-tight mb-8">Shop All Products</h1>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {productsWithParsedImages.map((product) => (
                     <ProductCard key={product.id} product={product} />
                 ))}
             </div>
