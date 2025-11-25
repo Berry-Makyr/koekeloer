@@ -98,7 +98,8 @@ export default async function ProductPage({ params }: { params: { slug: string }
                             images: images,
                             categoryId: product.categoryId,
                             stock: product.stock,
-                            featured: product.featured
+                            featured: product.featured,
+                            createdAt: product.createdAt.toISOString()
                         }} />
                     </div>
                 </div>
