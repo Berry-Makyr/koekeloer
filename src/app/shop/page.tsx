@@ -11,7 +11,8 @@ export default async function ShopPage() {
     const productsWithParsedImages = products.map(product => ({
         ...product,
         images: JSON.parse(product.images),
-        salePrice: product.salePrice || undefined
+        salePrice: product.salePrice || undefined,
+        createdAt: product.createdAt.toISOString()
     }));
 
     return (
