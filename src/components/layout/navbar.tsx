@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { ShoppingCart, Menu, Search, User, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -19,32 +20,36 @@ export function Navbar() {
     const cartItems = useCartStore((state) => state.items);
     const itemCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
     const { data: session } = useSession();
+    const [mobileOpen, setMobileOpen] = useState(false);
 
     return (
         <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
             <div className="container flex h-16 items-center justify-between">
+                {/* Logo and navigation */}
                 <div className="flex items-center gap-6 md:gap-10">
                     <Link href="/" className="flex items-center space-x-2">
-                        <span className="text-2xl font-bold tracking-tight text-primary">
-                            Koekeloer
-                        </span>
+                        <span className="text-2xl font-bold tracking-tight text-primary">Koekeloer</span>
                     </Link>
+                    {/* Desktop links */}
                     <nav className="hidden md:flex gap-6">
-                        <Link
-                            href="/shop"
-                            className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
-                        >
+                        <Link href="/shop" className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary">
                             Shop
                         </Link>
-                        <Link
-                            href="/categories"
-                            className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
-                        >
+                        <Link href="/categories" className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary">
                             Categories
                         </Link>
                     </nav>
+                    {/* Mobile menu button */}
+                    <button
+                        className="md:hidden flex items-center"
+                        onClick={() => setMobileOpen(!mobileOpen)}
+                        aria-label="Toggle navigation"
+                    >
+                        <Menu className="h-6 w-6" />
+                    </button>
                 </div>
 
+                {/* Right side: search, cart, user */}
                 <div className="flex items-center gap-4">
                     <div className="relative hidden sm:block w-full max-w-sm">
                         <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -64,7 +69,8 @@ export function Navbar() {
                                     className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center rounded-full p-0 text-[10px]"
                                 >
                                     {itemCount}
-                                </Badge>)}
+                                </Badge>
+                            )}
                             <span className="sr-only">Cart</span>
                         </Button>
                     </Link>
@@ -96,9 +102,7 @@ export function Navbar() {
                     ) : (
                         <div className="flex items-center gap-2">
                             <Link href="/login">
-                                <Button variant="ghost" size="sm">
-                                    Login
-                                </Button>
+                                <Button variant="ghost" size="sm">Login</Button>
                             </Link>
                             <Link href="/register">
                                 <Button size="sm">Register</Button>
@@ -107,6 +111,19 @@ export function Navbar() {
                     )}
                 </div>
             </div>
+            {/* Mobile navigation links */}
+            {mobileOpen && (
+                <nav className="absolute top-full left-0 w-full bg-background border-b md:hidden">
+                    <div className="flex flex-col gap-4 p-4">
+                        <Link href="/shop" className="text-sm font-medium text-muted-foreground hover:text-primary">
+                            Shop
+                        </Link>
+                        <Link href="/categories" className="text-sm font-medium text-muted-foreground hover:text-primary">
+                            Categories
+                        </Link>
+                    </div>
+                </nav>
+            )}
         </header>
     );
 }

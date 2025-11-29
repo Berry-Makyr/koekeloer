@@ -11,12 +11,24 @@ export function AddToCartButton({ product }: { product: Product }) {
     const [isAdded, setIsAdded] = useState(false);
 
     const handleAddToCart = () => {
+        // Safe image extraction
+        const image = Array.isArray(product.images)
+            ? product.images[0]
+            : (() => {
+                try {
+                    const parsed = JSON.parse(product.images as unknown as string);
+                    return Array.isArray(parsed) ? parsed[0] : '/placeholder.png';
+                } catch {
+                    return '/placeholder.png';
+                }
+            })();
+
         addItem({
             id: product.id,
             name: product.name,
             price: product.salePrice || product.price,
             quantity: 1,
-            image: product.images[0],
+            image: image || '/placeholder.png',
         });
         setIsAdded(true);
         setTimeout(() => setIsAdded(false), 2000);
